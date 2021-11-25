@@ -23,6 +23,7 @@ block_params = ['num_clips','num_texts','text_times','text_titles']
 # logo_pos (optional): A list of [x,y] positons of the logo.
 # logo_times (optional): A list of [start_time,end_time] times of the logo.
 # logo_dims (optional): A list of [width,height] dimensions of the logo.
+# logo_effect (optional): The effect of the logo.
 
 block_config = {
     'SimpleBlock4': {'num_clips':1, 'clip_pos':[[0,0]], 'clip_times':[[0,4]], 'clip_dims':[['width','height']],
