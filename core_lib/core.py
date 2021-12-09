@@ -45,6 +45,7 @@ class Structure:
                 not_list = True
                 arg_v = [arg_v]
             for v_id,v in enumerate(arg_v):
+                # v.replace('pos_', 'pos')
                 if is_str(v) and 'fwd_' in v:
                     v2 = copy.deepcopy(v)
                     v = v.replace('fwd_','')
@@ -259,8 +260,8 @@ def art_effect(text='', font_size=40, color='white', font='/usr/local/share/font
     bar_an2 = VerticalAppearAnimation(bar, direction='up', num_chunks_2=num_chunks).bwd
     img_pos = [gap//2+barw, 0]
     clips += [t1_an1, t2_an1, t3_an1, bar_an1, bar_an2, img_clip, img_clip2]
-    pos += [img_pos, [f'fwd_pos_x+{tws[0]}', 'fwd_pos_y'], [f'fwd_pos_x+{tws[1]}', 'fwd_pos_y']]
-    pos += [[0, f'fwd_pos_y+7']]*2
+    pos += [img_pos, [f'fwd_posx+{tws[0]}', 'fwd_posy'], [f'fwd_posx+{tws[1]}', 'fwd_posy']]
+    pos += [[0, f'fwd_posy+7']]*2
     pos += [img_pos]*2
     times += [[an_dur,an_dur*4], [an_dur*2,an_dur*4], [an_dur*3,an_dur*4]]
     times += [[an_dur,duration-an_dur-an_dur], duration-an_dur-an_dur]
@@ -553,7 +554,7 @@ def zoom_effect(text='', font_size=95, font='/usr/local/share/fonts/energized/Po
     times = [[zoom_start, zoom_end-zoom_out_dur],zoom_end-zoom_out_dur]
     return ProntoClip(clips=[zoom_in, zoom_out], vh=vh, w=vw, times=times, end=duration)
 
-def fresh_effect(text='', font_size=40, font='/usr/local/share/fonts/relaxed/NotoSansTC-Medium.otf', theme=[16,184,254],
+def fresh_effect(text='', font_size=40, font='Poppins-ExtraBold.ttf', theme=[16,184,254],
                  color='white', wrap_width=35, start=0, end=5, fps=30, img=None, **kwargs):
     
     '''
@@ -564,7 +565,7 @@ def fresh_effect(text='', font_size=40, font='/usr/local/share/fonts/relaxed/Not
         text (str): The text to display.
         font_size (int): The font size.
         font (str): The font to use.
-        theme (str or [r,g,b] list): The color of the bar on the left.
+        theme (str or [r,g,b] list): The color of the text background.
         color (str or [r,g,b] list): The color of the text.
         wrap_width (int): The nuber of text characters per line.
         start (int): The starting timestamp(second) of the clip.
@@ -594,7 +595,7 @@ def fresh_effect(text='', font_size=40, font='/usr/local/share/fonts/relaxed/Not
         temp_an = ans[temp_direction]
         trans_direction = ans[trans_direction]
         align = random.choice(alignement)
-        blank_bgs, text_bgs, temp = text_template_components(text=text, temp_alpha=0, align=align,
+        blank_bgs, text_bgs, temp = text_template_components(text=text, align=align,
                                                              temp_bg_color=theme, color=color,
                                                              text_bg_alpha=210, font_size=font_size,
                                                              font=font, wrap_width=wrap_width)
@@ -617,32 +618,108 @@ def fresh_effect(text='', font_size=40, font='/usr/local/share/fonts/relaxed/Not
         vh,vw = get_hw(temp)
         return ProntoClip(clips=clips, pos=pos, times=times, vh=vh, vw=vw, end=duration)
 
-def fresh_first_effect(text='', font_size=40, font='/usr/local/share/fonts/relaxed/NotoSansTC-Medium.otf',
-                       color='white', wrap_width=35, start=0, end=5, fps=30, align='center', img=None, **kwargs):
+def fresh_start_effect(text='', font_size=40, font='Poppins-ExtraBold.ttf', theme=[16,184,254],
+                       color='white', wrap_width=35, start=0, end=5, fps=30, img=None, vh=540, vw=960, pos=[0.5,0.15], **kwargs):
     duration = end-start
+    text_pos = copy.deepcopy(pos)
     clips = []
     pos = []
     times = []
+    bg = solid_color_img((vh, vw, 3), alpha=170, color=theme)
+    clips.append(mp.ImageClip(bg, duration=duration))
+    pos.append([0,0])
+    times.append([0,-1])
     
     if len(text) > 0:
-        temp = text_template(text=text, temp_alpha=0, align=align, text_bg_alpha=0, font_size=font_size,
+        temp = text_template(text=text, temp_alpha=0, align='center', text_bg_alpha=0, font_size=font_size,
                              font=font, gap=0, full_text_bg=True, color=color, wrap_width=wrap_width)
         th,tw = get_hw(temp)
+<<<<<<< HEAD
         underline = solid_color_img((10, 75, 3), color='white')
         bg = solid_color_img((th+10+10, tw,3), alpha=0)
         img = paste_img(temp, bg, pos=[0.5, 0.])
         img = paste_img(underline, img, pos=[0.5,th+10])
         text_clip = mp.ImageClip(img, duration=duration).set_fadein(0.5)
+=======
+        text_clip = mp.ImageClip(temp, duration=duration-0.2).set_fadein(0.5)
+>>>>>>> 1a300f9202d28e9ed65a8e90a529704a285131b5
         clips.append(text_clip)
-        pos.append([0,0])
-        times.append(0)
-        vh,vw = get_hw(img)
-        return ProntoClip(clips=clips, pos=pos, times=times, vh=vh, vw=vw, end=duration, fps=fps)
-    return blank_clip(duration)
+        pos.append(text_pos)
+        times.append(0.2)
+        underline_clip = mp.ImageClip(solid_color_img((10, 75, 3), color=color), duration=duration-0.1).set_fadein(0.5)
+        clips.append(underline_clip)
+        times.append(0.1)
+        pos.append([0.5,f'fwd_posy+{th+10}'])
+    return ProntoClip(clips=clips, pos=pos, times=times, vh=vh, vw=vw, end=duration, fps=fps)
+
+def sap_effect(text='', font_size1=35, font1='FranklinGothic_Bold.ttf', font_size2=25, font2='FranklinGothic-Light.ttf',
+               theme=[255,215,0], color='white', start=0, end=5, fps=30, vw=960, **kwargs):
+    
+    duration = end-start
+    clips = []
+    pos = []
+    times = []
+    
+    if len(text) == 0:
+        return blank_clip(duration)
+    if not is_list(text):
+        text = [text]
+    t1 = text[0]
+    text1 = text_template(text=t1, wrap_width=25, font=font1, font_size=font_size1, gap=0,
+                          align='left', color=color, full_text_bg=True, text_bg_alpha=0)
+    if len(text) > 1:
+        t2 = text[1]
+    else:
+        t2 = ''
+    text2 = text_template(text=t2, wrap_width=40, font=font2, font_size=font_size2, gap=0,
+                          align='left', color=color, full_text_bg=True, text_bg_alpha=0)
+    chunks = 10
+    an_dur = chunks/fps
+    text1_an = HorizontalSlideAnimation(text1, direction='right', num_chunks=chunks, fps=fps).fwd
+    text2_an = VerticalSlideAnimation(text2, direction='down', num_chunks=chunks, fps=30).fwd
+    
+    h1,w1 = get_hw(text1)
+    h2,w2 = get_hw(text2)
+    
+    slider1 = solid_color_img(((h1+h2+10, vw//8, 3)), color=theme)
+    sh,sw = get_hw(slider1)
+    barw = 10
+    bar = solid_color_img((sh,barw,3), color=theme)
+    sh2, sw2 = sh, vw-sw+barw
+    slider2 = solid_color_img((sh2,sw2,3), color=theme)
+    
+    slider1_an1 = HorizontalSlideAnimation(slider1, direction='right', num_chunks=chunks, fps=fps).fwd
+    slider1_an2 = HorizontalSlideAnimation(slider1, direction='left', num_chunks=chunks, fps=30).bwd
+    
+    slider2_an1 = HorizontalSlideAnimation(slider2, direction='right', num_chunks=chunks, fps=fps).fwd
+    slider2_an2 = HorizontalSlideAnimation(slider2, direction='left', num_chunks=chunks, fps=30).bwd
+    bar_clip = mp.ImageClip(bar, duration=an_dur)
+    
+    clips = [slider1_an1, slider1_an2, bar_clip, text1_an, text2_an, slider2_an1, slider2_an2]
+    pos = [[0.,0.], [0.,0.],
+           [sw-barw, 0.],
+           [f'fwd_posx+{barw+5}', 'fwd_posy+5'],
+           ['fwd_posx', f'fwd_posy+{h1}'],
+           ['fwd_posx2', 'fwd_posy2'], ['fwd_posx2', 'fwd_posy2']
+           ]
+    times = [0, an_dur,
+             [an_dur, duration-an_dur],
+             [an_dur, duration-an_dur],
+             [an_dur*2, duration-an_dur],
+             duration-an_dur*2,
+             duration-an_dur,
+             ]
+    return ProntoClip(clips=clips, pos=pos, times=times, vh=sh, vw=vw, start=0, end=duration, fps=fps)
+    
 
 effects_dict = {'no_effect':no_effect, 'art_effect':art_effect, 'slide_effect':slide_effect, 'move_effect':move_effect,
                 'slide_move_effect': slide_move_effect, 'candid_effect':candid_effect, 'bold_effect':bold_effect,
+<<<<<<< HEAD
                 'zoom_effect': zoom_effect, 'fresh_first_effect': fresh_first_effect
+=======
+                'zoom_effect': zoom_effect, 'fresh_effect': fresh_effect, 'fresh_start_effect':fresh_start_effect,
+                'sap_effect': sap_effect
+>>>>>>> 1a300f9202d28e9ed65a8e90a529704a285131b5
                 }
 
 def slide_transition(v, direction='left', num_chunks=5, fps=30, vh=540, vw=960, clip_dur=5):
@@ -662,24 +739,30 @@ def zoom_transition(v, zoom_chunks=5, zoom_scales=[0.2,1], pos=(0.5,0.5), bg=Non
     return trans_v
 
 def fresh_transition(v, theme=[16,184,254], fps=30):
+    if type(v).__name__ == 'ProntoClip':
+        v = v.v
     vw,vh = v.size
     trans_direction = random.choice(['down', 'right'])
     ans = {'down':VerticalAppearAnimation, 'right':HorizontalAppearAnimation}
     trans_an = ans[trans_direction]
     return trans_an(solid_color_img((vh, vw, 3), color=theme, alpha=255),
-                    direction=trans_direction, num_chunks=15, fps=fps, reverse=True)
+                    direction=trans_direction, num_chunks=10, fps=fps, reverse=True)
 
 def add_transition(v, trans, start=0, end=5, fps=30):
     if trans is None:
         return v
     duration = end-start
     # print(trans['trans_name'], trans['trans_args'])
-    trans, trans_args = trans_dict[trans['trans_name']], trans['trans_args']
+    trans_name = trans['trans_name']
+    trans, trans_args = trans_dict[trans_name], trans.get('trans_args', {})
     trans = trans(v, **trans_args, fps=fps)
     trans_v = trans.v
-    trans_dur = trans.durs[0]
+    if 'fresh' in trans_name:
+        trans_dur = 0
+    else:
+        trans_dur = trans.durs[0]
     vw,vh = trans_v.size
-    v = ProntoClip(clips=[trans_v,v], times=[0,[trans_dur, -1]], vh=vh, vw=vw, start=0, end=duration)
+    v = ProntoClip(clips=[v,trans_v], times=[[trans_dur, -1], 0], vh=vh, vw=vw, start=0, end=duration)
     # save_video(v, 'trans.mp4')
     return v
 
@@ -690,7 +773,7 @@ def add_clip_effect(v, effect, fps=30):
     v = effect(v, **effect_args, fps=fps)
     return v
 
-trans_dict = {'slide_transition': slide_transition, 'zoom_transition':zoom_transition}
+trans_dict = {'slide_transition': slide_transition, 'zoom_transition':zoom_transition, 'fresh_transition':fresh_transition}
 
 def fresh_end_effect(v, start=0, end=5, theme=[16,184,254], **kwargs):
     duration = end-start
@@ -700,7 +783,7 @@ def fresh_end_effect(v, start=0, end=5, theme=[16,184,254], **kwargs):
     duration = max(duration, v.duration)
     return ProntoClip(clips=[v, bg_clip], pos=[[0,0], [0,0]], times=[[0,-1], [start, end]], vh=vh, vw=vw, end=duration)
 
-clip_effects_dict = {}
+clip_effects_dict = {'fresh_end_effect':fresh_end_effect}
 
 class ProntoClip(ProntoClass):
     def __init__(self, bg_clip='', clips=[], vh=540, vw=960, start=0, end=5, pos=[], times=[], music_files=[], music_file='',
@@ -834,6 +917,8 @@ def get_block_args(temp_blocks, clip_paths=[], texts=[], logo='', vh=540, vw=960
     bg_clip = mp.ImageClip(solid_color_img((vh, vw, 3), alpha=None), duration=1)
     extra_effect = {'effect_name': 'no_effect', 'effect_args': {}}
     if len(clip_paths) > 0:
+        if len(np.unique(clip_paths)) == 1 and np.unique(clip_paths)[0] == '':
+            clip_paths = [bg_clip]
         # block_clip_idx = []
         # block_text_idx = []
         for b in temp_blocks:
@@ -865,9 +950,10 @@ def get_block_args(temp_blocks, clip_paths=[], texts=[], logo='', vh=540, vw=960
                 clip_paths += [bg_clip]*(clips_end_id-len(clip_paths))    
                 
             clip_idx = b.get('clip_idx', list(range(clips_used, clips_end_id)))[:num_clips]
-            clip_idx += [clip_idx[-1]]*(num_clips-len(clip_idx))
+            if len(clip_idx) > 0:
+                clip_idx += [clip_idx[-1]]*(num_clips-len(clip_idx))
             b['clip_idx'] = clip_idx
-            block_clips = list(np.array(clip_paths)[clip_idx])
+            block_clips = (np.array(clip_paths)[clip_idx]).tolist()
             for i,zipped in enumerate(zip(read_clips(block_clips, dims=clip_dims), clip_trans, clip_effects, clip_times)):
                 v,trans,effect,ct = zipped
                 if ct[-1] == -1:
@@ -878,9 +964,10 @@ def get_block_args(temp_blocks, clip_paths=[], texts=[], logo='', vh=540, vw=960
             #                for v,trans,effect,ct in zip(read_clips(block_clips, dims=clip_dims), clip_trans, clip_effects, clip_times)]
             
             text_idx = b.get('text_idx', list(range(texts_used, texts_end_id)))[:num_texts]
-            text_idx += [text_idx[-1]]*(num_texts-len(text_idx))
+            if len(text_idx) > 0:
+                text_idx += [text_idx[-1]]*(num_texts-len(text_idx))
             b['text_idx'] = text_idx
-            block_texts = list(np.array(texts)[text_idx])
+            block_texts = (np.array(texts)[text_idx]).tolist()
             
             for i,text_args in enumerate(zip(text_times, text_effects, block_texts)):
                 tt,e,txt = text_args
@@ -904,8 +991,8 @@ def get_block_args(temp_blocks, clip_paths=[], texts=[], logo='', vh=540, vw=960
                 logo_pos = block_args.get('logo_pos', [0.5,0.5])
                 if is_list(logo_pos) and is_list(logo_pos[0]):
                     logo_pos = logo_pos[0]
-                logo = resize_logo(logo, height=h, width=w)
-                logo_clip = mp.ImageClip(logo, duration=1)
+                logo_pic = resize_logo(logo, height=h, width=w)
+                logo_clip = mp.ImageClip(logo_pic, duration=1)
                 logo_effect = block_args.get('logo_effect', None)
                 logo_clip = add_clip_effect(logo_clip, logo_effect, fps=fps)
                 logo_times = block_args.get('logo_times', [[0,block_duration]])
