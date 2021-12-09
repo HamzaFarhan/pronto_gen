@@ -629,7 +629,7 @@ def fresh_first_effect(text='', font_size=40, font='/usr/local/share/fonts/relax
                              font=font, gap=0, full_text_bg=True, color=color, wrap_width=wrap_width)
         th,tw = get_hw(temp)
         underline = solid_color_img((10, 75, 3), color='white')
-        bg = solid_color_img((th+10+10, tw), alpha=0)
+        bg = solid_color_img((th+10+10, tw,3), alpha=0)
         img = paste_img(temp, bg, pos=[0.5, 0.])
         img = paste_img(underline, img, pos=[0.5,th+10])
         text_clip = mp.ImageClip(img, duration=duration).set_fadein(0.5)
@@ -642,7 +642,7 @@ def fresh_first_effect(text='', font_size=40, font='/usr/local/share/fonts/relax
 
 effects_dict = {'no_effect':no_effect, 'art_effect':art_effect, 'slide_effect':slide_effect, 'move_effect':move_effect,
                 'slide_move_effect': slide_move_effect, 'candid_effect':candid_effect, 'bold_effect':bold_effect,
-                'zoom_effect': zoom_effect
+                'zoom_effect': zoom_effect, 'fresh_first_effect': fresh_first_effect
                 }
 
 def slide_transition(v, direction='left', num_chunks=5, fps=30, vh=540, vw=960, clip_dur=5):
