@@ -634,7 +634,11 @@ def fresh_start_effect(text='', font_size=40, font='Poppins-ExtraBold.ttf', them
         temp = text_template(text=text, temp_alpha=0, align='center', text_bg_alpha=0, font_size=font_size,
                              font=font, gap=0, full_text_bg=True, color=color, wrap_width=wrap_width)
         th,tw = get_hw(temp)
-        text_clip = mp.ImageClip(temp, duration=duration-0.2).set_fadein(0.5)
+        underline = solid_color_img((10, 75, 3), color='white')
+        bg = solid_color_img((th+10+10, tw,3), alpha=0)
+        img = paste_img(temp, bg, pos=[0.5, 0.])
+        img = paste_img(underline, img, pos=[0.5,th+10])
+        text_clip = mp.ImageClip(img, duration=duration).set_fadein(0.5)
         clips.append(text_clip)
         pos.append(text_pos)
         times.append(0.2)
@@ -702,12 +706,51 @@ def sap_effect(text='', font_size1=35, font1='FranklinGothic_Bold.ttf', font_siz
              duration-an_dur,
              ]
     return ProntoClip(clips=clips, pos=pos, times=times, vh=sh, vw=vw, start=0, end=duration, fps=fps)
-    
+
+def ds_effect(text='', font_size1=35, font1='FranklinGothic_Bold.ttf', font_size2=25, font2='FranklinGothic-Light.ttf',
+                        font_size3=20,font3='FranklinGothic-Light.ttf',
+               theme=[255,215,0], color='white', start=0, end=5, fps=30,  vh=540, vw=960, **kwargs):
+    duration=end-start
+    clips = []
+    pos = []
+    times = []
+    if len(text) == 0:
+        return blank_clip(duration)
+    if not is_list(text):
+        text = [text]
+    t1 = text[0]
+    text1 = text_template(text=t1, wrap_width=8, font=font1, font_size=font_size1, gap=0,
+                          align='left', color=color, full_text_bg=True, text_bg_alpha=0)
+    t2=text[1]
+    text2=text_template(text=t2, wrap_width=25, font=font1, font_size=17, gap=0,
+                          align='left', color=color, full_text_bg=True, text_bg_alpha=0)
+    t3=text[2]
+    text3=text_template(text=t3, wrap_width=25, font=font1, font_size=17, gap=0,
+                          align='left', color='black', full_text_bg=True, text_bg_alpha=0)
+    slider1=solid_color_img(((vh, 5*(vw//6), 3)), color=theme)
+    chunks = 20
+    an_dur = chunks/fps
+    slider1_an2=HorizontalSlideAnimation(slider1, direction='right', num_chunks=chunks, fps=30).bwd
+    bar1 = solid_color_img((vh,vw//3,3), color=[90,90,90])
+    bar_an1=mp.ImageClip(bar1, duration=duration)
+    bar2 = solid_color_img((vh,vw//15,3), color=[0,0,0])
+    bar2_an1=MoveAnimation(bar2,bg=solid_color_img((vh,vw,3),alpha=0),x1=vw//3-vw//15,y1=0,x2=0,y2=0).v
+    bar3 = solid_color_img((vh,vw//30,3), color=[0,0,0])
+    bar3_an1=MoveAnimation(bar3,bg=solid_color_img((vh,vw,3),alpha=0),x1=vw//3-vw//30,y1=0,x2=0,y2=0).v
+    tex1=ZoomAnimation(text1,direction='down',zoom_scales=[6,1],zoom_chunks=4).v
+    tex2=ZoomAnimation(text2,direction='down',zoom_scales=[6,1],zoom_chunks=4).v
+    tex3=VerticalAppearAnimation(text3).v
+    th,tw=get_hw(text1)
+    th2,tw2=get_hw(text2)
+    clips=[bar_an1, slider1_an2, bar2_an1, bar3_an1, bar2_an1, bar3_an1, tex1,tex2,tex3]
+    pos=[[0.0,0.0],[0,0],[0,0],[0,0],[0,0],[0,0],[vw//6-tw//2,vh//8],[vw//6-tw2//2,0.8],[0.8,0.8]]
+    times=[0,0,an_dur,1.5*an_dur,2*an_dur,2.5*an_dur,[0,duration],[an_dur,duration],[2*an_dur,duration]]
+    return ProntoClip(clips=clips, pos=pos, times=times, vh=vh, vw=vw, start=0, end=duration, fps=fps)
 
 effects_dict = {'no_effect':no_effect, 'art_effect':art_effect, 'slide_effect':slide_effect, 'move_effect':move_effect,
                 'slide_move_effect': slide_move_effect, 'candid_effect':candid_effect, 'bold_effect':bold_effect,
                 'zoom_effect': zoom_effect, 'fresh_effect': fresh_effect, 'fresh_start_effect':fresh_start_effect,
-                'sap_effect': sap_effect
+                'sap_effect': sap_effect,'ds_effect':ds_effect
                 }
 
 def slide_transition(v, direction='left', num_chunks=5, fps=30, vh=540, vw=960, clip_dur=5):

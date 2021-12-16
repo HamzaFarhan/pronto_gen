@@ -43,6 +43,14 @@ block_config = {
                     'text_times':[[1,4], [1,4]], 'text_titles':['text1','text2'],
                     'duration':5, 'fps':30,
                     },
+     'QBlock5':      {'num_clips':3, 'clip_pos':[[0,0],[0.2,0.2],[0.7,0.7]], 'clip_times':[[0,5],[1,4],[1,4]], 
+                     'clip_dims':[['width','height'],['width//4','height//4'],['width//4','height//4']],
+                      'num_texts':1, 'text_pos':[[0.5,0.9]], 'text_times':[[1,4]], 'text_titles':['text1'], 'duration':5, 'fps':30
+                      },
+        'DSBlock5':{'num_clips':1,'clips_pos':[[0,0]],'clip_times':[[0,5]],
+                        'clip_dims':[['width','height']],'num_texts':1,'text_pos':[[0,0]],
+                        'text_times':[[0,5]],'text_titles':['text1'],'duration':5,'fps':30
+                        },
     'BoldEndBlock2':{'num_clips':1, 'clip_pos':[[0.5,0.5]], 'clip_times':[[0,-1]], 'clip_dims':[['width','height']],
                      'num_texts':1, 'text_pos':[[0.5,0.75]], 'text_times':[[0,-1]],'text_titles':['text1'], 'duration':2, 'fps':30,
                      'logo_pos': [[0.5,0.3]], 'logo_times': [[0,-1]], 'logo_dims': [[None, 'height//3']],
@@ -743,8 +751,53 @@ template_config = {
                             ]
         
              }
+        },
+        'QT':{
+             'categories':['QT'],
+             'allowed_fonts':['NotoSansTC-Medium.otf'],
+             5:{
+                     'blocks':[
+                                {
+                                        'block_name':'QBlock5',
+                                        'effects': [
+                                                        {
+                                                        'effect_name': 'sap_effect',
+                                                        'effect_args': {
+                                                                        'font_size':30,
+                                                                        'color':'white',
+                                                                        'font':'NotoSansTC-Medium.otf',
+                                                                        'theme':[255,215,0],
+                                                                        'fps':30
+                                                                        }
+                                                        }
+                                                ]
+                                 }
+                              ]
+             }
+        },
+        'Dealership':{
+                'categories':['Dealership'],
+                'allowed_fonts':['Poppins-ExtraBold.ttf'],
+                5:{
+                        'blocks':[
+                                {
+                                        'block_name':'DSBlock5',
+                                        'effects':[
+                                                {
+                                                        'effect_name':'ds_effect',
+                                                        'effect_args':{
+                                                                'font_size':30,
+                                                                'color':'white',
+                                                                'font':'Poppins-ExtraBold.ttf',
+                                                                'theme':[128,128,128],
+                                                                'fps':30
+                                                                }
+                                                }
+                                        ]
+                                }
+                                ]
+                }
         }
-            
            
     
 }
